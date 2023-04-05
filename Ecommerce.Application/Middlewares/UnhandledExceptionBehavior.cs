@@ -11,7 +11,7 @@ namespace Ecommerce.Application.Middlewares
     {
         public Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            
         }
     }
 }
