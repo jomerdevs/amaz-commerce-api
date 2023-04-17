@@ -1,4 +1,5 @@
-﻿using Ecommerce.Domain;
+﻿using Ecommerce.Application.Features.Products.Queries.ViewModels;
+using Ecommerce.Domain;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Features.Products.Queries.GetProductList
 {
-    public class GetProductListQuery : IRequest<List<Product>>
+    public class GetProductListQuery : IRequest<IReadOnlyList<ProductViewModel>>
     {
     }
 }

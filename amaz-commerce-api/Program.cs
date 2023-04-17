@@ -1,6 +1,11 @@
+using Ecommerce.Application;
+using Ecommerce.Application.Features.Products.Queries.GetProductList;
+using Ecommerce.Application.Interfaces.Infrastructure;
 using Ecommerce.Domain;
 using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.AppContext;
+using Ecommerce.Infrastructure.ImageCloudinary;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -10,11 +15,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // inyectando el InfrastructureService que creamos en la clase InfrastructureServiceRegistration de infrastructure
 builder.Services.AddInfrastructureService(builder.Configuration);
+builder.Services.AddApplicationServices(builder.Configuration);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionString"),
@@ -23,6 +30,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
+builder.Services.AddMediatR(typeof(GetProductListQueryHandler).Assembly);
+
+builder.Services.AddScoped<IManageImageService, ManageImageService>();
+
 // Add services to the container.
 
 builder.Services.AddControllers(options =>
@@ -30,7 +41,7 @@ builder.Services.AddControllers(options =>
     // Agregar protección para que el acceso a todos los endpoints requiera que el usuario este autenticado
     var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     options.Filters.Add(new AuthorizeFilter(policy));
-});
+}).AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 IdentityBuilder identityBuilder = builder.Services.AddIdentityCore<Usuario>();
 
