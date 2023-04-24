@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ecommerce.Application.Pagination;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -58,5 +59,9 @@ namespace Ecommerce.Application.Repository
 
         // eliminar una lista de objetos en una sola línea
         void DeleteRange(IReadOnlyList<T> entities);
+
+        Task<T> GetByIdWithSpec(IPagination<T> spec);
+        Task<IReadOnlyList<T>> GetAllWithSpec(IPagination<T> spec);
+        Task<int> CountAsync(IPagination<T> spec);
     }
 }

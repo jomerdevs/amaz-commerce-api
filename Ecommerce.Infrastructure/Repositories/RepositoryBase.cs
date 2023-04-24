@@ -1,5 +1,7 @@
-﻿using Ecommerce.Application.Repository;
+﻿using Ecommerce.Application.Pagination;
+using Ecommerce.Application.Repository;
 using Ecommerce.Infrastructure.AppContext;
+using Ecommerce.Infrastructure.Pagination;
 using MailKit.Search;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -36,7 +38,7 @@ namespace Ecommerce.Infrastructure.Repositories
         public void AddRange(List<T> entities)
         {
             _context.Set<T>().AddRange(entities);
-        }
+        }        
 
         public async Task DeleteAsync(T entity)
         {
@@ -58,6 +60,7 @@ namespace Ecommerce.Infrastructure.Repositories
         {
             return await _context.Set<T>().ToListAsync();
         }
+        
 
         public async Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>> predicate)
         {
@@ -91,7 +94,7 @@ namespace Ecommerce.Infrastructure.Repositories
         public async Task<T> GetByIdAsync(int id)
         {
             return (await _context.Set<T>().FindAsync(id))!;
-        }
+        }        
 
         public async Task<T> GetEntityAsync(Expression<Func<T, bool>>? predicate, List<Expression<Func<T, object>>>? includes = null, bool disableTracking = true)
         {
@@ -116,6 +119,26 @@ namespace Ecommerce.Infrastructure.Repositories
         {
             _context.Set<T>().Attach(entity);
             _context.Entry(entity).State = EntityState.Modified;
+        }
+
+        public async Task<T> GetByIdWithSpec(IPagination<T> spec)
+        {
+            return (await ApplyPagination(spec).FirstOrDefaultAsync())!;
+        }
+
+        public async Task<IReadOnlyList<T>> GetAllWithSpec(IPagination<T> spec)
+        {
+            return await ApplyPagination(spec).ToListAsync();
+        }
+
+        public async Task<int> CountAsync(IPagination<T> spec)
+        {
+            return await ApplyPagination(spec).CountAsync();
+        }
+
+        public IQueryable<T> ApplyPagination(IPagination<T> spec)
+        {
+            return PaginationEvaluator<T>.GetQuery(_context.Set<T>().AsQueryable(), spec);
         }
     }
 }
